@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatBot - Confeitaria Gatito</title>
+    <style>
+        body { font-family: Arial; background: #fffaf8; padding: 20px; text-align: center; }
+        #chatbox { width: 80%; max-width: 500px; margin: 0 auto; border: 2px solid #f3a6b0; padding: 10px; border-radius: 10px; background: #fff; height: 400px; overflow-y: auto; }
+        .user { text-align: right; color: #c94f6d; }
+        .bot { text-align: left; color: #333; }
+        input { width: 70%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background: #f26b8a; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #d3546c; }
+    </style>
+</head>
+<body>
+    <h2>Confeitaria Gatito</h2>
+    <div id="chatbox"></div>
+    <br>
+    <input id="mensagem" placeholder="Digite sua mensagem..." />
+    <button onclick="enviar()">Enviar</button>
+
+    <script>
+        async function enviar() {
+            const msg = document.getElementById("mensagem").value;
+            if (!msg.trim()) return;
+
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<p class="user"><b>Você:</b> ${msg}</p>`;
+            document.getElementById("mensagem").value = "";
+
+            const resposta = await fetch("/chatbot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mensagem: msg })
+            });
+            const dados = await resposta.json();
+            chatbox.innerHTML += `<p class="bot"><b>Bot:</b> ${dados.resposta}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- templates/recomendacoes.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendações</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">🍰 Produtos Recomendados</h2>
+
+        <div class="card shadow p-4 mb-4">
+            <h4>Você comprou: <span class="text-primary">{{ produto }}</span></h4>
+        </div>
+
+        {% if recomendados %}
+            <div class="row">
+                {% for item in recomendados %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ url_for('static', filename='images/' + imagens_produtos[item]) }}" 
+                             class="card-img-top" alt="{{ item }}">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ item }}</h5>
+                            <a href="{{ url_for('produtos') }}" class="btn btn-primary">Comprar</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-3 text-muted text-center">Nenhuma recomendação disponível para este produto.</p>
+        {% endif %}
+
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('produtos') }}" class="btn btn-secondary">Voltar aos produtos</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

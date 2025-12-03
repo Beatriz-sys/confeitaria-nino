@@ -1,0 +1,257 @@
+<!-- from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_mail import Mail, Message
+from dotenv import load_dotenv
+import os
+import sqlite3
+
+load_dotenv()  # Carrega variáveis do arquivo .env
+
+app = Flask(__name__)
+app.secret_key = 'sua_chave_secreta'
+
+# Configuração do Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'beatrizsantoslima969@gmail.com'
+app.config['MAIL_PASSWORD'] = 'rrjnhbvgpplqxsjf'
+app.config['MAIL_DEFAULT_SENDER'] = 'beatrizsantoslima969@gmail.com'
+
+mail = Mail(app)
+
+with app.app_context():
+    msg = Message("Teste de conexão", recipients=['seu-email@gmail.com'])
+    msg.body = "Mensagem de teste"
+    mail.send(msg)
+
+DB_NAME = 'bancoTeste.db'
+
+# ====================== FUNÇÕES DE E-MAIL ======================
+def enviar_email_boas_vindas(nome, email):
+    msg = Message(
+        subject="Bem-vindo à Confeitaria Gatito!",
+        recipients=[email]
+    )
+    msg.html = render_template("emails/boas_vindas.html", nome=nome)
+    mail.send(msg)
+
+def enviar_email_pedido(nome, email, id_pedido, valor):
+    msg = Message(
+        subject="Pedido Confirmado - Confeitaria Gatito",
+        recipients=[email]
+    )
+    msg.html = render_template("emails/pedido_confirmado.html", nome=nome, id_pedido=id_pedido, valor=valor)
+    mail.send(msg)
+
+# ====================== ROTAS ======================
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/cestas-buy")
+def cestas_buy():
+    return render_template("cestas-buy.html")
+
+@app.route("/produtos")
+def produtos():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM produtos")
+    produtos = cursor.fetchall()
+    conn.close()
+     # transforma tuplas em lista de dicionários
+    lista_produtos = []
+    for p in produtos:
+        lista_produtos.append({
+            'id': p[0],
+            'nome': p[1],
+            'descricao': p[2],
+            'preco': p[3],
+            'imagem': p[4]
+        })
+
+    return render_template("produtos.html", produtos=lista_produtos)
+
+@app.route("/novo", methods=["GET", "POST"])
+def novo():
+    if request.method == "POST":
+        nome = request.form['nome']
+        descricao = request.form['descricao']
+        preco = float(request.form['preco'])
+        imagem = request.files['imagem'].filename if 'imagem' in request.files else ''
+        
+        if imagem:
+            caminho = os.path.join('static/uploads', imagem)
+            request.files['imagem'].save(caminho)
+
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO produtos (nome, descricao, preco, imagem) VALUES (?, ?, ?, ?)",
+                       (nome, descricao, preco, imagem))
+        conn.commit()
+        conn.close()
+        flash("Produto cadastrado com sucesso!", "success")
+        return redirect(url_for('produtos'))
+    return render_template("novo.html")
+
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar(id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM produtos WHERE id=?", (id,))
+    produto = cursor.fetchone()
+
+    if request.method == "POST":
+        nome = request.form['nome']
+        descricao = request.form['descricao']
+        preco = float(request.form['preco'])
+        imagem = request.files['imagem'].filename if 'imagem' in request.files else produto[4]
+
+        if request.files.get('imagem'):
+            caminho = os.path.join('static/uploads', imagem)
+            request.files['imagem'].save(caminho)
+
+        cursor.execute("UPDATE produtos SET nome=?, descricao=?, preco=?, imagem=? WHERE id=?",
+                       (nome, descricao, preco, imagem, id))
+        conn.commit()
+        conn.close()
+        flash("Produto atualizado com sucesso!", "success")
+        return redirect(url_for('produtos'))
+
+    conn.close()
+    return render_template("novo.html", produto=produto)
+
+@app.route("/excluir/<int:id>")
+def excluir(id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM produtos WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+    flash("Produto excluído com sucesso!", "success")
+    return redirect(url_for('produtos'))
+
+@app.route("/pagina_compra")
+def pagina_compra():
+    # Exemplo de produto estático, depois pode integrar dinâmico
+    produto = {
+        "nome": "Cesta da cafe da manha",
+        "preco": "430,00 - 490,00",
+        "descricao": "A cesta preferida dos nossos clientes...",
+        "imagem": "cesta_cafe.jpg"
+    }
+    return render_template("pagina-compra.html", nome_produto=produto["nome"], preco_produto=produto["preco"], descricao_produto=produto["descricao"], imagem_produto=produto["imagem"])
+
+@app.route("/contato", methods=["GET", "POST"])
+def contato():
+    if request.method == "POST":
+        nome = request.form['nome']
+        email = request.form['email']
+        mensagem = request.form['mensagem']
+
+        msg = Message(
+            subject=f"Mensagem de Contato - {nome}",
+            recipients=[os.getenv('MAIL_DEFAULT_SENDER')]
+        )
+        msg.body = f"Nome: {nome}\nEmail: {email}\nMensagem:\n{mensagem}"
+        mail.send(msg)
+
+        flash("Mensagem enviada com sucesso!", "success")
+        return redirect(url_for('contato'))
+
+    return render_template("contato.html")
+
+@app.route("/milfolhas-buy")
+def milfolhas_buy():
+    # Renderiza a página de compra do Mil Folhas
+    return render_template("milfolhas-buy.html")
+
+@app.route("/eclairs-buy")
+def eclairs_buy():
+    return render_template("eclairs-buy.html")
+
+@app.route("/gateus-buy")
+def gateus_buy():
+    return render_template("gateus-buy.html")
+
+
+# ====================== AUTENTICAÇÃO ======================
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['senha']
+
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO login (nome, email, senha) VALUES (?, ?, ?)", (nome, email, senha))
+        conn.commit()
+        conn.close()
+
+        # Envia e-mail de boas-vindas
+        enviar_email_boas_vindas(nome, email)
+
+        flash("Cadastro realizado com sucesso! Verifique seu e-mail.", "success")
+        return redirect(url_for('login'))
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form['email']
+        senha = request.form['senha']
+
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM login WHERE email=? AND senha=?", (email, senha))
+        usuario = cursor.fetchone()
+        conn.close()
+
+        if usuario:
+            session['usuario'] = usuario[1]
+            flash(f"Bem-vindo, {usuario[1]}!", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Email ou senha incorretos!", "danger")
+            return redirect(url_for('login'))
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop('usuario', None)
+    flash("Logout realizado com sucesso!", "success")
+    return redirect(url_for('home'))
+
+@app.route("/editar_conta", methods=["GET", "POST"])
+def editar_conta():
+    if 'usuario' not in session:
+        flash("Faça login para acessar esta página.", "danger")
+        return redirect(url_for('login'))
+
+    usuario_nome = session['usuario']
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM login WHERE nome=?", (usuario_nome,))
+    usuario = cursor.fetchone()
+
+    if request.method == "POST":
+        novo_nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['senha']
+
+        cursor.execute("UPDATE login SET nome=?, email=?, senha=? WHERE id=?", (novo_nome, email, senha, usuario[0]))
+        conn.commit()
+        session['usuario'] = novo_nome
+        flash("Conta atualizada com sucesso!", "success")
+        return redirect(url_for('home'))
+
+    conn.close()
+    return render_template("editar_conta.html", usuario=usuario)
+
+# ====================== EXECUÇÃO ======================
+if __name__ == "__main__":
+    app.run(debug=True) -->

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ produto.nome }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <header>
+        <span class="logotipo">Gatito</span>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}">Loja online</a></li>
+                <li><a href="{{ url_for('contato') }}">Contato</a></li>
+                <li><a href="{{ url_for('sacola') }}">Sacola</a></li>
+                {% if 'usuario' in session %}
+                <li>
+                    <p>Olá, {{ session['usuario'] }} |
+                        <a href="{{ url_for('editar_conta') }}">Editar Conta</a> |
+                        <a href="{{ url_for('logout') }}">Sair</a>
+                    </p>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('produtos') }}">Produtos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container-geral">
+        <div class="img-compra">
+            <img class="imagem" src="{{ url_for('static', filename='uploads/' + produto['imagem']) }}"
+                alt="{{ produto['nome'] }}">
+        </div>
+
+        <div class="resto-compra">
+            <p class="nome_produto">{{ produto['nome'] }}</p>
+            <p><b>R$ {{ produto['preco'] }}</b></p>
+            <p class="descricao_produto">{{ produto['descricao'] }}</p>
+
+            <!-- Form para adicionar ao carrinho -->
+            <form action="{{ url_for('adicionar_carrinho', produto_id=produto['id']) }}" method="get">
+                <button type="submit" class="add-carrinho btn btn-primary">Adicionar ao carrinho</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container-footer">
+            <div class="row-footer">
+                <div class="footer-col">
+                    <h4>Empresa</h4>
+                    <ul>
+                        <li><a href="">logo</a></li>
+                        <li><a href="">LinkedIn</a></li>
+                        <li><a href="">Facebook</a></li>
+                        <li><a href="">Instagram</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Home page</h4>
+                    <ul>
+                        <li><a href="">Loja online</a></li>
+                        <li><a href="">Sobre</a></li>
+                        <li><a href="">Minha conta</a></li>
+                        <li><a href="">Contato</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

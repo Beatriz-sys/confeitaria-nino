@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Conta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!--header-->
+    <header>
+        <a href="{{ url_for('home') }}"><span class="logotipo">Gatito - Editar conta</span></a>
+
+    </header>
+
+    <div class="parte_laranja">
+
+        <div class="arte">
+            <img class="arte_img" src="{{ url_for('static', filename='images/arte_login.png') }}" alt="arte_login">
+        </div>
+
+        <!-- Formulário de Edição -->
+        <div class="form_cadastro">
+            <form method="POST">
+                    <label>Nome:</label>
+                    <input class="input_login" type="text" name="nome" value="{{ user['nome'] }}" required>       
+
+                    <label>Email:</label>
+                    <input class="input_login" type="email" name="email" value="{{ user['email'] }}" required>
+            
+                    <label>Senha:</label>
+                    <input type="password" class="input_login" name="senha" value="{{ user['senha'] }}" required>
+                
+                    <button class="loginbtn" type="submit">Salvar Alterações</button>
+            
+            </form>
+
+            <!-- Formulário de Exclusão SEPARADO -->
+            <form method="POST" class="form_carrinho" action="{{ url_for('excluir_conta') }}"
+                onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não poderá ser desfeita.')" >
+                <button type="submit" class="btncarrinho">Excluir Conta</button>
+            </form>
+
+            <a href="{{ url_for('home') }}" class="btncancelar">Cancelar</a>
+        </div>
+    
+    </div>
+
+    <!--roadape-->
+    <footer>
+        <div class="container-footer">
+            <div class="row-footer">
+                <div class="footer-col">
+                    <h4>Empresa</h4>
+                    <ul>
+                        <li><a href="">logo</a></li>
+                        <li><a href="">linkedln</a></li>
+                        <li><a href="">facebook</a></li>
+                        <li><a href="">instagram</a></li>
+                        <li><a href="">#confeitariadama</a></li>
+                        <li><a href="">#damalovers</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Home page</h4>
+                    <ul>
+                        <li><a href="">Loja online</a></li>
+                        <li><a href="">Petito Gatito</a></li>
+                        <li><a href="">Sobre</a></li>
+                        <li><a href="">Nossas lojas</a></li>
+                        <li><a href="">FAQ</a></li>
+                        <li><a href="">Blog</a></li>
+                        <li><a href="">Minha conta</a></li>
+                        <li><a href="">Contato</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contato</h4>
+                    <ul>
+                        <li><a href="">Delivery</a></li>
+                        <li><a href="">19 99123 4567</a></li>
+                        <li><a href="">Eventos</a></li>
+                        <li><a href="">19 98765 4321</a></li>
+                        <li><a href="">Trabalhe conosco</a></li>
+                        <li><a href="">recrutamento@confeitariagatito.com.br</a></li>
+                        <li><a href="">Marketing</a></li>
+                        <li><a href="">marketing@confeitariagatito.com.br</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

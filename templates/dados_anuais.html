@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Vendas</title>
+
+    <!-- Plotly CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            padding: 20px;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .container {
+            width: 85%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        img {
+            width: 80%;
+            max-width: 500px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>Dashboard de Vendas</header>
+
+<div class="container">
+
+    <!-- Imagens -->
+    <div class="card">
+        <h2>Produtos em Destaque</h2>
+        <img src="{{ url_for('static', filename='images/janeiro-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/janeiro-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/fevereiro-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/fevereiro-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/marco-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/marco-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/maio-barra.png') }}" alt="Imagem de Produto">>
+        <img src="{{ url_for('static', filename='images/maio-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/junho-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/junho-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/julho-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/julho-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/agosto-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/agosto-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/setembro-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/setembro-pizza.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/outubro-barra.png') }}" alt="Imagem de Produto">
+        <img src="{{ url_for('static', filename='images/outubro-pizza.png') }}" alt="Imagem de Produto">
+        
+     
+    </div>
+
+    <!-- Gráfico -->
+    <div class="card">
+        <h2>Vendas no Ano</h2>
+        <!-- Aqui o código do gráfico será inserido -->
+        <div id="grafico"></div>
+
+        <!-- Importa conteúdo do HTML gerado pelo Python -->
+        <script>
+            fetch("grafico_vendas.html")
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("grafico").innerHTML = html;
+                })
+        </script>
+    </div>
+
+</div>
+
+</body>
+</html>
+
